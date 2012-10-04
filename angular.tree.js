@@ -56,7 +56,7 @@
             }
         }
 
-        return itemTemplate || angular.element('<li class="ng-tree-node"><div>{{item}}</div></li>');
+        return itemTemplate || angular.element('<li class="ng-tree-node"><div>{{item}}</div><ul></ul></li>');
     }
 
     function findParentListItem (target) {
@@ -183,50 +183,44 @@
         } else if (index === 0) {
             listElem.prepend(itemElem);
         } else {
-            listElem.eq(index - 1).after(itemElem);
+            listElem.children().eq(index - 1).after(itemElem);
         }
     }
 
     function loadTree (scope, tree, listElem, listWatch) {
-        scope.$watch(listWatch, function (newList, oldList, scope) {
+        scope.$watch(listWatch, function (newList, oldList) {
             if (typeof newList === 'undefined' || newList === null || newList.length === 0) {
                 listElem.children().remove();
                 return;
             }
 
-            // Remove list DOM elements that do not exist in the new list data
-            (function() {
-                var listChildren = listElem.children();
+            angular.forEach(newList, function (item, itemIndex) {
+                var listChildElems = listElem.children();
 
-                angular.forEach(listChildren, function (child) {
-                    if (newList.indexOf(tree.getItem(child.scope())) < 0) {
-                        child.remove();
+                if (itemIndex >= listChildElems.length) {
+                    addListItem(scope, tree, listElem, item, -1);
+                    return;
+                }
+
+                for (var childElemIndex = itemIndex; childElemIndex < listChildElems.length; childElemIndex += 1) {
+                    var childElem = angular.element(listChildElems[childElemIndex]);
+                    var childItem = tree.getItem(childElem.scope());
+
+                    if (childItem === item) {
+                        break;
                     }
-                });
-            })();
+                }
 
-            (function () {
-                angular.forEach(newList, function (item, index) {
-                    var listChildren = listElem.children(); // TODO don't do this ever loop iteration
+                if (childElemIndex >= listChildElems.length) {
+                    addListItem(scope, tree, listElem, item, itemIndex);
+                } else if (childElemIndex !== itemIndex) {
+                    insertListItem(listElem, listChildElems[childElemIndex], itemIndex);
+                }
+            });
 
-                    if (index >= listChildren.length) {
-                        addListItem(scope, tree, listElem, item, -1);
-                        return;
-                    }
-
-                    for (var i = index; i < listChildren.length; i += 1) {
-                        if (tree.getItem(angular.element(listChildren[i]).scope()) === item) {
-                            break;
-                        }
-                    }
-
-                    if (i >= listChildren.length) {
-                        addListItem(scope, tree, listElem, item, index);
-                    } else if (i !== index) {
-                        insertListItem(listElem, listChildren[i], index);
-                    }
-                });
-            })();
+            while (listElem.children().length > newList.length) {
+                listElem.children().eq(newList.length).remove();
+            }
         }, true);
     }
 
