@@ -1,4 +1,4 @@
-(function (angular, document) {
+(function (angular) {
     'use strict';
 
     function getItemTemplate (document, treeElem) {
