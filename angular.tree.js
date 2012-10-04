@@ -1,3 +1,9 @@
+/**
+ * @license angular.tree v0.1
+ * (c) 2012 Cory Thomas http://github.com/dump247/angular.tree
+ * License: MIT
+ */
+
 (function (angular) {
     'use strict';
 
