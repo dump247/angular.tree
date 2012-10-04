@@ -123,17 +123,15 @@
             (function() {
                 var listChildren = listElem.children();
 
-                for (var i = 0; i < listChildren.length; i += 1) {
-                    var child = angular.element(listChildren[i]);
-
+                angular.forEach(listChildren, function (child) {
                     if (newList.indexOf(tree.getItem(child.scope())) < 0) {
                         child.remove();
                     }
-                }
+                });
             })();
 
             (function () {
-                newList.forEach(function (item, index) {
+                angular.forEach(newList, function (item, index) {
                     var listChildren = listElem.children(); // TODO don't do this ever loop iteration
 
                     if (index >= listChildren.length) {
@@ -159,7 +157,6 @@
 
     angular.module('angularTree', []).
         directive('ngTree', function ($compile, $document) {
-
             return {
                 compile: function (elem, attrs) {
                     var tree = initTree(elem, attrs, $compile, $document);
