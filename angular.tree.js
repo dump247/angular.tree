@@ -46,10 +46,31 @@
                 childNode.appendChild(document.createElement('UL'));
 
                 itemTemplate = angular.element(childNode);
+                itemTemplate.addClass('ng-tree-node');
             }
         }
 
-        return itemTemplate || angular.element('<li><div>{{item}}</div></li>');
+        return itemTemplate || angular.element('<li class="ng-tree-node"><div>{{item}}</div></li>');
+    }
+
+    function findParentListItem (target) {
+        var parentListItem = target;
+
+        if (target && (target.nodeName !== 'LI' || ! target.className.match(/\bng-tree-node\b/))) {
+            parentListItem = findParentListItem(target.parentNode);
+        }
+
+        return parentListItem ? angular.element(parentListItem) : null;
+    }
+
+    function descendNodes (listElem, callback) {
+        angular.forEach(listElem.children('li'), function (itemElem) {
+            var $itemElem = angular.element(itemElem);
+
+            if (callback(listElem, $itemElem) !== false) {
+                descendNodes($itemElem.children().eq(1), callback);
+            }
+        });
     }
 
     function initTree (treeElem, attributes, $compile, $document) {
@@ -58,6 +79,8 @@
         var eachIter = itemTemplate[0].getAttribute('each');
         var contextName = 'item';
         var collectionExpr = 'item.children';
+        var selectExpr = itemTemplate.attr('select');
+        var selectedName = itemTemplate.attr('selected');
 
         if (eachIter) {
             var match = /^\s*(\w+)\s+in\s+(.*?)\s*$/.exec(eachIter);
@@ -70,7 +93,8 @@
             collectionExpr = contextName + '.' + match[2];
         }
 
-        return {
+        var tree = {
+            multiple: 'multiple' in attributes,
             rootElem: treeElem,
             treeModelExpr: treeModelExpr,
             itemTemplate: $compile(itemTemplate),
@@ -86,15 +110,52 @@
 
             setItem: function (scope, value) {
                 scope[this.contextName] = value;
+            },
+
+            selected: function (scope, value) {
+                scope.$selected = value;
+
+                if (selectExpr) {
+                    scope.$apply(selectExpr);
+                }
             }
         };
+
+        treeElem.bind('click', function (evt) {
+            var selectedItemElem = findParentListItem(evt.target);
+            var changed = false;
+
+            if (evt.metaKey && tree.multiple) {
+                if (selectedItemElem) {
+                    tree.selected(selectedItemElem.scope(), ! selectedItemElem.hasClass('ng-tree-node-selected'));
+                }
+            } else {
+                descendNodes(treeElem, function (listElem, itemElem) {
+                    if ((! selectedItemElem || itemElem[0] !== selectedItemElem[0]) && itemElem.hasClass('ng-tree-node-selected')) {
+                        tree.selected(itemElem.scope(), false);
+                    }
+                });
+
+                if (selectedItemElem && ! selectedItemElem.hasClass('ng-tree-node-selected')) {
+                    tree.selected(selectedItemElem.scope(), true);
+                }
+            }
+        });
+
+        return tree;
     }
 
     function addListItem (scope, tree, listElem, item, index) {
         var itemScope = scope.$new();
         tree.setItem(itemScope, item);
+        itemScope.$selected = false;
 
         var itemElem = tree.itemTemplate(itemScope, angular.noop);
+
+        itemScope.$watch('$selected', function (newValue) {
+            itemElem.toggleClass('ng-tree-node-selected', newValue);
+        });
+
         insertListItem(listElem, itemElem, index);
 
         var childrenListElem = itemElem.children().eq(1);
