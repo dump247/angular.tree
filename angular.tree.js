@@ -112,35 +112,41 @@
                 scope[this.contextName] = value;
             },
 
-            selected: function (scope, value) {
-                scope.$selected = value;
+            trackSelection: !!selectExpr,
 
-                if (selectExpr) {
-                    scope.$apply(selectExpr);
+            selected: function (scope, value) {
+                if (this.trackSelection) {
+                    scope.$selected = value;
+
+                    if (selectExpr) {
+                        scope.$apply(selectExpr);
+                    }
                 }
             }
         };
 
-        treeElem.bind('click', function (evt) {
-            var selectedItemElem = findParentListItem(evt.target);
-            var changed = false;
+        if (tree.trackSelection) {
+            treeElem.bind('click', function (evt) {
+                var selectedItemElem = findParentListItem(evt.target);
+                var changed = false;
 
-            if (evt.metaKey && tree.multiple) {
-                if (selectedItemElem) {
-                    tree.selected(selectedItemElem.scope(), ! selectedItemElem.hasClass('ng-tree-node-selected'));
-                }
-            } else {
-                descendNodes(treeElem, function (listElem, itemElem) {
-                    if ((! selectedItemElem || itemElem[0] !== selectedItemElem[0]) && itemElem.hasClass('ng-tree-node-selected')) {
-                        tree.selected(itemElem.scope(), false);
+                if (evt.metaKey && tree.multiple) {
+                    if (selectedItemElem) {
+                        tree.selected(selectedItemElem.scope(), ! selectedItemElem.hasClass('ng-tree-node-selected'));
                     }
-                });
+                } else {
+                    descendNodes(treeElem, function (listElem, itemElem) {
+                        if ((! selectedItemElem || itemElem[0] !== selectedItemElem[0]) && itemElem.hasClass('ng-tree-node-selected')) {
+                            tree.selected(itemElem.scope(), false);
+                        }
+                    });
 
-                if (selectedItemElem && ! selectedItemElem.hasClass('ng-tree-node-selected')) {
-                    tree.selected(selectedItemElem.scope(), true);
+                    if (selectedItemElem && ! selectedItemElem.hasClass('ng-tree-node-selected')) {
+                        tree.selected(selectedItemElem.scope(), true);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         return tree;
     }
@@ -148,13 +154,15 @@
     function addListItem (scope, tree, listElem, item, index) {
         var itemScope = scope.$new();
         tree.setItem(itemScope, item);
-        itemScope.$selected = false;
 
         var itemElem = tree.itemTemplate(itemScope, angular.noop);
 
-        itemScope.$watch('$selected', function (newValue) {
-            itemElem.toggleClass('ng-tree-node-selected', newValue);
-        });
+        if (tree.trackSelection) {
+            itemScope.$selected = false;
+            itemScope.$watch('$selected', function (newValue) {
+                itemElem.toggleClass('ng-tree-node-selected', newValue);
+            });
+        }
 
         insertListItem(listElem, itemElem, index);
 
