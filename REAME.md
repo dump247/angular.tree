@@ -109,6 +109,47 @@ will result in the following HTML:
 </ul>
 ```
 
+## Selection
+
+Tree items can be selected and deselected if a selection change
+expression is provided. If no select expression is provided, selection
+support will not be enabled.
+
+The 'select' attribute must be an expression that is evaluated in the
+scope of the tree node that was selected/deselected. The 'this' variable
+of the expression will be the scope of the tree node. A special scope
+variable '$selected' is set to true if the item is selected and false
+if not.
+
+```html
+<ul ng-tree="model">
+    <li select="selected()">{{item.name}}</li>
+</ul>
+```
+
+```javascript
+$scope.selected = function () {
+    console.log(this.item.name + ' is selected: ' + this.$selected);
+};
+```
+
+### Multiple Selection
+
+Multiple tree nodes can be selected at once by enabling mutli-selection
+on the tree.
+
+When enabled, holding down the meta key (Control/Command key) allows
+the user to select multiple tree nodes.
+
+Note: a 'select' expression must be provided to enable selection support
+for the tree.
+
+```html
+<ul ng-tree="model" multiple>
+    <li select="selected()">{{item.name}}</li>
+</ul>
+```
+
 # License
 
 The MIT License (MIT)  
