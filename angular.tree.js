@@ -125,7 +125,7 @@
                     scope.$selected = value;
 
                     if (selectExpr) {
-                        scope.$apply(selectExpr);
+                        scope.$eval(selectExpr);
                     }
                 }
             }
@@ -134,21 +134,27 @@
         if (tree.trackSelection) {
             treeElem.bind('click', function (evt) {
                 var selectedItemElem = findParentListItem(evt.target);
-                var changed = false;
+
 
                 if (evt.metaKey && tree.multiple) {
                     if (selectedItemElem) {
-                        tree.selected(selectedItemElem.scope(), ! selectedItemElem.hasClass('ng-tree-node-selected'));
+                        selectedItemElem.scope().$apply(function () {
+                            tree.selected(selectedItemElem.scope(), ! selectedItemElem.hasClass('ng-tree-node-selected'));
+                        });
                     }
                 } else {
                     descendNodes(treeElem, function (listElem, itemElem) {
                         if ((! selectedItemElem || itemElem[0] !== selectedItemElem[0]) && itemElem.hasClass('ng-tree-node-selected')) {
-                            tree.selected(itemElem.scope(), false);
+                            itemElem.scope().$apply(function () {
+                                tree.selected(itemElem.scope(), false);
+                            });
                         }
                     });
 
                     if (selectedItemElem && ! selectedItemElem.hasClass('ng-tree-node-selected')) {
-                        tree.selected(selectedItemElem.scope(), true);
+                        selectedItemElem.scope().$apply(function () {
+                            tree.selected(selectedItemElem.scope(), true);
+                        });
                     }
                 }
             });
@@ -219,7 +225,13 @@
             });
 
             while (listElem.children().length > newList.length) {
-                listElem.children().eq(newList.length).remove();
+                var removeElem = listElem.children().eq(newList.length);
+
+                if (removeElem.hasClass('ng-tree-node-selected')) {
+                    tree.selected(removeElem.scope(), false);
+                }
+                
+                removeElem.remove();
             }
         }, true);
     }
