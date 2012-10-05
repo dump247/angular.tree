@@ -2,6 +2,22 @@
 
 Tree control directive for [angularjs](http://www.angularjs.org).
 
+# Installation
+
+Copy the script into your project and add a script tag to your page.
+
+```html
+<script src="/js/angular.tree.js"></script>
+```
+
+Add a dependency to your application module.
+
+```javascript
+angular.module('myApp', ['angularTree']);
+```
+
+Add a tree to your application. See [Usage](#usage).
+
 # Usage
 
 In this simple example 'model' is an expression in the current scope that results
