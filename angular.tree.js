@@ -99,6 +99,8 @@
             collectionExpr = contextName + '.' + match[2];
         }
 
+        treeElem.addClass('ng-tree');
+
         var tree = {
             multiple: 'multiple' in attributes,
             rootElem: treeElem,
