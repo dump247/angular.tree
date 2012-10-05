@@ -135,23 +135,22 @@
             treeElem.bind('click', function (evt) {
                 var selectedItemElem = findParentListItem(evt.target);
 
-
                 if (evt.metaKey && tree.multiple) {
                     if (selectedItemElem) {
                         selectedItemElem.scope().$apply(function () {
-                            tree.selected(selectedItemElem.scope(), ! selectedItemElem.hasClass('ng-tree-node-selected'));
+                            tree.selected(selectedItemElem.scope(), ! selectedItemElem.scope().$selected);
                         });
                     }
                 } else {
                     descendNodes(treeElem, function (listElem, itemElem) {
-                        if ((! selectedItemElem || itemElem[0] !== selectedItemElem[0]) && itemElem.hasClass('ng-tree-node-selected')) {
+                        if ((! selectedItemElem || itemElem[0] !== selectedItemElem[0]) && itemElem.scope().$selected) {
                             itemElem.scope().$apply(function () {
                                 tree.selected(itemElem.scope(), false);
                             });
                         }
                     });
 
-                    if (selectedItemElem && ! selectedItemElem.hasClass('ng-tree-node-selected')) {
+                    if (selectedItemElem && ! selectedItemElem.scope().$selected) {
                         selectedItemElem.scope().$apply(function () {
                             tree.selected(selectedItemElem.scope(), true);
                         });
@@ -171,9 +170,6 @@
 
         if (tree.trackSelection) {
             itemScope.$selected = false;
-            itemScope.$watch('$selected', function (newValue) {
-                itemElem.toggleClass('ng-tree-node-selected', newValue);
-            });
         }
 
         insertListItem(listElem, itemElem, index);
@@ -227,7 +223,7 @@
             while (listElem.children().length > newList.length) {
                 var removeElem = listElem.children().eq(newList.length);
 
-                if (removeElem.hasClass('ng-tree-node-selected')) {
+                if (removeElem.scope().$selected) {
                     tree.selected(removeElem.scope(), false);
                 }
                 
