@@ -136,25 +136,30 @@
         if (tree.trackSelection) {
             treeElem.bind('click', function (evt) {
                 var selectedItemElem = findParentListItem(evt.target);
+                var selectedItemScope = selectedItemElem ? selectedItemElem.scope() : null;
 
                 if (evt.metaKey && tree.multiple) {
-                    if (selectedItemElem) {
-                        selectedItemElem.scope().$apply(function () {
-                            tree.selected(selectedItemElem.scope(), ! selectedItemElem.scope().$selected);
+                    if (selectedItemScope) {
+                        selectedItemScope.$apply(function () {
+                            tree.selected(selectedItemScope, ! selectedItemScope.$selected);
                         });
                     }
                 } else {
                     descendNodes(treeElem, function (listElem, itemElem) {
-                        if ((! selectedItemElem || itemElem[0] !== selectedItemElem[0]) && itemElem.scope().$selected) {
-                            itemElem.scope().$apply(function () {
-                                tree.selected(itemElem.scope(), false);
-                            });
+                        if (! selectedItemElem || itemElem[0] !== selectedItemElem[0]) {
+                            var itemScope = itemElem.scope();
+
+                            if (itemScope.$selected) {
+                                itemScope.$apply(function () {
+                                    tree.selected(itemScope, false);
+                                });
+                            }
                         }
                     });
 
-                    if (selectedItemElem && ! selectedItemElem.scope().$selected) {
-                        selectedItemElem.scope().$apply(function () {
-                            tree.selected(selectedItemElem.scope(), true);
+                    if (selectedItemScope && ! selectedItemScope.$selected) {
+                        selectedItemScope.$apply(function () {
+                            tree.selected(selectedItemScope, true);
                         });
                     }
                 }
