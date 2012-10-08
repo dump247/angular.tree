@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Angular.tree : Tree widget for angularjs" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Angular.tree</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/dump247/angular.tree">View on GitHub</a>
+
+          <h1 id="project_title">Angular.tree</h1>
+          <h2 id="project_tagline">Tree widget for angularjs</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/dump247/angular.tree/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/dump247/angular.tree/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>Description</h1>
+
+<p>Tree control directive for <a href="http://www.angularjs.org">angularjs</a>.</p>
+
+<h1>Installation</h1>
+
+<p>Copy the script into your project and add a script tag to your page.</p>
+
+<div class="highlight"><pre><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/js/angular.tree.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
+
+<p>Add a dependency to your application module.</p>
+
+<div class="highlight"><pre><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myApp'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'angularTree'</span><span class="p">]);</span>
+</pre></div>
+
+<p>Add a tree to your application. See <a href="#usage">Usage</a>.</p>
+
+<h1>Usage</h1>
+
+<p>In this simple example 'model' is an expression in the current scope that results
+in an array of objects. The inner li is the template for the tree nodes.
+The default name for the current tree item is 'item' and each item
+should contain a list of child items in a property name 'children'.</p>
+
+<div class="highlight"><pre><span class="nt">&lt;ul</span> <span class="na">ng-tree=</span><span class="s">"model"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;li&gt;</span>{{item.name}}<span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</pre></div>
+
+<p>Example model:</p>
+
+<div class="highlight"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">model</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">'Item 1 Name'</span><span class="p">,</span>
+        <span class="nx">children</span><span class="o">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="nx">name</span><span class="o">:</span> <span class="s1">'Item 2 Name'</span>
+            <span class="p">},</span> <span class="p">{</span>
+                <span class="nx">name</span><span class="o">:</span> <span class="s1">'Item 3 Name'</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">];</span>       
+</pre></div>
+
+<h2>Context Variable and Collection Name</h2>
+
+<p>The default children collection and tree node context variable name can
+be overridden on the tree node template with an each expression.</p>
+
+<p>The default expression is <em>item in children</em>.</p>
+
+<div class="highlight"><pre><span class="nt">&lt;ul</span> <span class="na">ng-tree=</span><span class="s">"model"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;li</span> <span class="na">each=</span><span class="s">"obj in subItems"</span><span class="nt">&gt;</span>{{obj.name}}<span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</pre></div>
+
+<h2>Item Template Content Div</h2>
+
+<p>The contents of the tree item template will be automatically wrapped in
+a div element.</p>
+
+<p>So this template:</p>
+
+<div class="highlight"><pre><span class="nt">&lt;ul</span> <span class="na">ng-tree=</span><span class="s">"model"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;li&gt;</span>{{item.name}}<span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</pre></div>
+
+<p>will result in the following HTML:</p>
+
+<div class="highlight"><pre><span class="nt">&lt;ul</span> <span class="na">ng-tree=</span><span class="s">"tree"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"ng-scope"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"ng-binding"</span><span class="nt">&gt;</span>Item 1 Name<span class="nt">&lt;/div&gt;</span>
+        <span class="nt">&lt;ul&gt;</span>
+            <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"ng-scope"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"ng-binding"</span><span class="nt">&gt;</span>Item 2 Name<span class="nt">&lt;/div&gt;</span>
+                <span class="nt">&lt;ul&gt;&lt;/ul&gt;</span>
+            <span class="nt">&lt;/li&gt;</span>
+            <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"ng-scope"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"ng-binding"</span><span class="nt">&gt;</span>Item 3 Name<span class="nt">&lt;/div&gt;</span>
+                <span class="nt">&lt;ul&gt;&lt;/ul&gt;</span>
+            <span class="nt">&lt;/li&gt;</span>
+        <span class="nt">&lt;/ul&gt;</span>
+    <span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</pre></div>
+
+<p>You can control the wrapper element yourself by wrapping the contents of
+the item template in a single container element.</p>
+
+<p>So this template:</p>
+
+<div class="highlight"><pre><span class="nt">&lt;ul</span> <span class="na">ng-tree=</span><span class="s">"model"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;li&gt;&lt;span&gt;</span>{{item.name}}<span class="nt">&lt;/span&gt;&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</pre></div>
+
+<p>will result in the following HTML:</p>
+
+<div class="highlight"><pre><span class="nt">&lt;ul</span> <span class="na">ng-tree=</span><span class="s">"tree"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"ng-scope"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"ng-binding"</span><span class="nt">&gt;</span>Item 1 Name<span class="nt">&lt;/span&gt;</span>
+        <span class="nt">&lt;ul&gt;</span>
+            <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"ng-scope"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"ng-binding"</span><span class="nt">&gt;</span>Item 2 Name<span class="nt">&lt;/span&gt;</span>
+                <span class="nt">&lt;ul&gt;&lt;/ul&gt;</span>
+            <span class="nt">&lt;/li&gt;</span>
+            <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"ng-scope"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"ng-binding"</span><span class="nt">&gt;</span>Item 3 Name<span class="nt">&lt;/span&gt;</span>
+                <span class="nt">&lt;ul&gt;&lt;/ul&gt;</span>
+            <span class="nt">&lt;/li&gt;</span>
+        <span class="nt">&lt;/ul&gt;</span>
+    <span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</pre></div>
+
+<h2>Selection</h2>
+
+<p>Tree items can be selected and deselected if a selection change
+expression is provided. If no select expression is provided, selection
+support will not be enabled.</p>
+
+<p>The 'select' attribute must be an expression that is evaluated in the
+scope of the tree node that was selected/deselected. The 'this' variable
+of the expression will be the scope of the tree node. A special scope
+variable '$selected' is set to true if the item is selected and false
+if not.</p>
+
+<div class="highlight"><pre><span class="nt">&lt;ul</span> <span class="na">ng-tree=</span><span class="s">"model"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;li</span> <span class="na">select=</span><span class="s">"selected()"</span><span class="nt">&gt;</span>{{item.name}}<span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</pre></div>
+
+<div class="highlight"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">selected</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">item</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">' is selected: '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">$selected</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+
+<h3>Multiple Selection</h3>
+
+<p>Multiple tree nodes can be selected at once by enabling mutli-selection
+on the tree.</p>
+
+<p>When enabled, holding down the meta key (Control/Command key) allows
+the user to select multiple tree nodes.</p>
+
+<p>Note: a 'select' expression must be provided to enable selection support
+for the tree.</p>
+
+<div class="highlight"><pre><span class="nt">&lt;ul</span> <span class="na">ng-tree=</span><span class="s">"model"</span> <span class="na">multiple</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;li</span> <span class="na">select=</span><span class="s">"selected()"</span><span class="nt">&gt;</span>{{item.name}}<span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</pre></div>
+
+<h1>License</h1>
+
+<p>The MIT License (MIT)<br>
+Copyright (c) 2012 Cory Thomas</p>
+
+<p>See <a href="angularTree/blob/master/LICENSE">LICENSE</a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Angular.tree maintained by <a href="https://github.com/dump247">dump247</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
