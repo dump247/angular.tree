@@ -1,5 +1,5 @@
 /**
- * @license angular.tree v0.2
+ * @license angular.tree v0.3
  * (c) 2012 Cory Thomas http://github.com/dump247/angular.tree
  * License: MIT
  */
