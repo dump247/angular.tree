@@ -54,8 +54,10 @@
 
                     childNode.appendChild(wrapperEl);
                 }
-
-                childNode.appendChild(document.createElement('UL'));
+                
+                var ulEl = document.createElement('UL');
+                ulEl.className = treeElem.className;
+                childNode.appendChild(ulEl);
 
                 itemTemplate = angular.element(childNode);
                 itemTemplate.addClass('ng-tree-node');
