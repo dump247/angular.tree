@@ -54,8 +54,10 @@
 
                     childNode.appendChild(wrapperEl);
                 }
-
-                childNode.appendChild(document.createElement('UL'));
+                
+                var ulEl = document.createElement('UL');
+                ulEl.className = treeElem.className;
+                childNode.appendChild(ulEl);
 
                 itemTemplate = angular.element(childNode);
                 itemTemplate.addClass('ng-tree-node');
@@ -246,7 +248,7 @@
     }
 
     angular.module('angularTree', []).
-        directive('ngTree', function ($compile, $document) {
+        directive('ngTree', ['$compile', '$document', function ($compile, $document) {
             return {
                 compile: function (elem, attrs) {
                     var tree = initTree(elem, attrs, $compile, $document);
@@ -256,6 +258,6 @@
                     };
                 }
             };
-        });
+        }]);
 })(angular, navigator);
 
