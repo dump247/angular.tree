@@ -87,6 +87,14 @@
         });
     }
 
+    function selectedProperty(scope,sel) {
+        if (arguments.length > 1) {
+            scope.$selected = sel;
+        } else {
+            return scope.$selected;
+        }
+    }
+
     function initTree (treeElem, attributes, $compile, $document, $parse) {
         var itemTemplate = getItemTemplate($document[0], treeElem[0]);
         var treeModelExpr = attributes.src || attributes.ngTree;
@@ -133,7 +141,7 @@
 
             selected: function (scope, value, evt) {
                 if (this.trackSelection) {
-                    scope.$selected = value;
+                    selectedProperty(scope,value);
 
                     if (selectExpr) {
                         var f = $parse(selectExpr);
@@ -153,7 +161,7 @@
                 if ((evt[multiSelectKey] || tree.direct) && tree.multiple) {
                     if (selectedItemScope) {
                         selectedItemScope.$apply(function () {
-                            tree.selected(selectedItemScope, ! selectedItemScope.$selected, evt);
+                            tree.selected(selectedItemScope, ! selectedProperty(selectedItemScope), evt);
                         });
                     }
                 } else {
@@ -161,7 +169,7 @@
                         if (! selectedItemElem || itemElem[0] !== selectedItemElem[0]) {
                             var itemScope = itemElem.scope();
 
-                            if (itemScope.$selected) {
+                            if (selectedProperty(itemScope)) {
                                 itemScope.$apply(function () {
                                     tree.selected(itemScope, false, evt);
                                 });
@@ -169,7 +177,7 @@
                         }
                     });
 
-                    if (selectedItemScope && ! selectedItemScope.$selected) {
+                    if (selectedItemScope && ! selectedProperty(selectedItemScope)) {
                         selectedItemScope.$apply(function () {
                             tree.selected(selectedItemScope, true, evt);
                         });
@@ -188,7 +196,7 @@
         var itemElem = tree.itemTemplate(itemScope, angular.noop);
 
         if (tree.trackSelection) {
-            itemScope.$selected = false;
+            selectedProperty(itemScope,false);
         }
 
         insertListItem(listElem, itemElem, index);
@@ -242,7 +250,7 @@
             while (listElem.children().length > newList.length) {
                 var removeElem = listElem.children().eq(newList.length);
 
-                if (removeElem.scope().$selected) {
+                if (selectedProperty(removeElem.scope())) {
                     tree.selected(removeElem.scope(), false);
                 }
 
