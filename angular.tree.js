@@ -138,7 +138,6 @@
                     if (selectExpr) {
                         var f = $parse(selectExpr);
                         f(scope, {
-                            '$scope': scope,
                             '$event': evt
                         });
                     }
