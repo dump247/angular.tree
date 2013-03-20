@@ -94,7 +94,7 @@
         var contextName = 'item';
         var collectionExpr = 'item.children';
         var selectExpr = itemTemplate.attr('select');
-        var selectedName = itemTemplate.attr('selected');
+        var selectedExpr = itemTemplate[0].getAttribute('selected')||'$selected';
 
         if (eachIter) {
             var match = /^\s*(\w+)\s+in\s+(.*?)\s*$/.exec(eachIter);
@@ -145,11 +145,10 @@
             },
 
             selectedProperty: function(scope,value) {
-                var expr = '$selected';
                 if (arguments.length > 1) {
-                    $parse(expr).assign(scope,value);
+                    $parse(selectedExpr).assign(scope,value);
                 } else {
-                    return $parse(expr)(scope);
+                    return $parse(selectedExpr)(scope);
                 }
             }
         };
