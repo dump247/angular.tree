@@ -54,7 +54,7 @@
 
                     childNode.appendChild(wrapperEl);
                 }
-                
+
                 var ulEl = document.createElement('UL');
                 ulEl.className = treeElem.className;
                 childNode.appendChild(ulEl);
@@ -241,7 +241,7 @@
                 if (removeElem.scope().$selected) {
                     tree.selected(removeElem.scope(), false);
                 }
-                
+
                 removeElem.remove();
             }
         }, true);
