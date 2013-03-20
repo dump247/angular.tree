@@ -111,6 +111,7 @@
 
         var tree = {
             multiple: 'multiple' in attributes,
+            direct: 'direct' in attributes,
             rootElem: treeElem,
             treeModelExpr: treeModelExpr,
             itemTemplate: $compile(itemTemplate),
@@ -146,7 +147,7 @@
                 var selectedItemElem = findParentListItem(evt.target);
                 var selectedItemScope = selectedItemElem ? selectedItemElem.scope() : null;
 
-                if (evt[multiSelectKey] && tree.multiple) {
+                if ((evt[multiSelectKey] || tree.direct) && tree.multiple) {
                     if (selectedItemScope) {
                         selectedItemScope.$apply(function () {
                             tree.selected(selectedItemScope, ! selectedItemScope.$selected);
