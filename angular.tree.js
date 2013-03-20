@@ -131,14 +131,15 @@
 
             trackSelection: !!selectExpr,
 
-            selected: function (scope, value) {
+            selected: function (scope, value, evt) {
                 if (this.trackSelection) {
                     scope.$selected = value;
 
                     if (selectExpr) {
                         var f = $parse(selectExpr);
                         f(scope, {
-                            '$scope': scope
+                            '$scope': scope,
+                            '$event': evt
                         });
                     }
                 }
@@ -153,7 +154,7 @@
                 if ((evt[multiSelectKey] || tree.direct) && tree.multiple) {
                     if (selectedItemScope) {
                         selectedItemScope.$apply(function () {
-                            tree.selected(selectedItemScope, ! selectedItemScope.$selected);
+                            tree.selected(selectedItemScope, ! selectedItemScope.$selected, evt);
                         });
                     }
                 } else {
@@ -163,7 +164,7 @@
 
                             if (itemScope.$selected) {
                                 itemScope.$apply(function () {
-                                    tree.selected(itemScope, false);
+                                    tree.selected(itemScope, false, evt);
                                 });
                             }
                         }
@@ -171,7 +172,7 @@
 
                     if (selectedItemScope && ! selectedItemScope.$selected) {
                         selectedItemScope.$apply(function () {
-                            tree.selected(selectedItemScope, true);
+                            tree.selected(selectedItemScope, true, evt);
                         });
                     }
                 }
