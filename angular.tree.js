@@ -87,7 +87,7 @@
         });
     }
 
-    function initTree (treeElem, attributes, $compile, $document) {
+    function initTree (treeElem, attributes, $compile, $document, $parse) {
         var itemTemplate = getItemTemplate($document[0], treeElem[0]);
         var treeModelExpr = attributes.src || attributes.ngTree;
         var eachIter = itemTemplate[0].getAttribute('each');
@@ -136,7 +136,10 @@
                     scope.$selected = value;
 
                     if (selectExpr) {
-                        scope.$eval(selectExpr);
+                        var f = $parse(selectExpr);
+                        f(scope, {
+                            '$scope': scope
+                        });
                     }
                 }
             }
@@ -249,10 +252,10 @@
     }
 
     angular.module('angularTree', []).
-        directive('ngTree', ['$compile', '$document', function ($compile, $document) {
+        directive('ngTree', ['$compile', '$document', '$parse', function ($compile, $document, $parse) {
             return {
                 compile: function (elem, attrs) {
-                    var tree = initTree(elem, attrs, $compile, $document);
+                    var tree = initTree(elem, attrs, $compile, $document, $parse);
 
                     return function (scope, elem, attrs) {
                         loadTree(scope, tree, elem, tree.treeModelWatch);
