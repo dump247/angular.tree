@@ -87,14 +87,6 @@
         });
     }
 
-    function selectedProperty(scope,sel) {
-        if (arguments.length > 1) {
-            scope.$selected = sel;
-        } else {
-            return scope.$selected;
-        }
-    }
-
     function initTree (treeElem, attributes, $compile, $document, $parse) {
         var itemTemplate = getItemTemplate($document[0], treeElem[0]);
         var treeModelExpr = attributes.src || attributes.ngTree;
@@ -141,7 +133,7 @@
 
             selected: function (scope, value, evt) {
                 if (this.trackSelection) {
-                    selectedProperty(scope,value);
+                    this.selectedProperty(scope,value);
 
                     if (selectExpr) {
                         var f = $parse(selectExpr);
@@ -149,6 +141,14 @@
                             '$event': evt
                         });
                     }
+                }
+            },
+
+            selectedProperty: function(scope,value) {
+                if (arguments.length > 1) {
+                    scope.$selected = value;
+                } else {
+                    return scope.$selected;
                 }
             }
         };
@@ -161,7 +161,7 @@
                 if ((evt[multiSelectKey] || tree.direct) && tree.multiple) {
                     if (selectedItemScope) {
                         selectedItemScope.$apply(function () {
-                            tree.selected(selectedItemScope, ! selectedProperty(selectedItemScope), evt);
+                            tree.selected(selectedItemScope, ! tree.selectedProperty(selectedItemScope), evt);
                         });
                     }
                 } else {
@@ -169,7 +169,7 @@
                         if (! selectedItemElem || itemElem[0] !== selectedItemElem[0]) {
                             var itemScope = itemElem.scope();
 
-                            if (selectedProperty(itemScope)) {
+                            if (tree.selectedProperty(itemScope)) {
                                 itemScope.$apply(function () {
                                     tree.selected(itemScope, false, evt);
                                 });
@@ -177,7 +177,7 @@
                         }
                     });
 
-                    if (selectedItemScope && ! selectedProperty(selectedItemScope)) {
+                    if (selectedItemScope && ! tree.selectedProperty(selectedItemScope)) {
                         selectedItemScope.$apply(function () {
                             tree.selected(selectedItemScope, true, evt);
                         });
@@ -196,7 +196,7 @@
         var itemElem = tree.itemTemplate(itemScope, angular.noop);
 
         if (tree.trackSelection) {
-            selectedProperty(itemScope,false);
+            tree.selectedProperty(itemScope,false);
         }
 
         insertListItem(listElem, itemElem, index);
@@ -250,7 +250,7 @@
             while (listElem.children().length > newList.length) {
                 var removeElem = listElem.children().eq(newList.length);
 
-                if (selectedProperty(removeElem.scope())) {
+                if (tree.selectedProperty(removeElem.scope())) {
                     tree.selected(removeElem.scope(), false);
                 }
 
