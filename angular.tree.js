@@ -145,10 +145,11 @@
             },
 
             selectedProperty: function(scope,value) {
+                var expr = '$selected';
                 if (arguments.length > 1) {
-                    scope.$selected = value;
+                    $parse(expr).assign(scope,value);
                 } else {
-                    return scope.$selected;
+                    return $parse(expr)(scope);
                 }
             }
         };
