@@ -54,7 +54,7 @@
 
                     childNode.appendChild(wrapperEl);
                 }
-                
+
                 var ulEl = document.createElement('UL');
                 ulEl.className = treeElem.className;
                 childNode.appendChild(ulEl);
@@ -87,14 +87,14 @@
         });
     }
 
-    function initTree (treeElem, attributes, $compile, $document) {
+    function initTree (treeElem, attributes, $compile, $document, $parse) {
         var itemTemplate = getItemTemplate($document[0], treeElem[0]);
         var treeModelExpr = attributes.src || attributes.ngTree;
         var eachIter = itemTemplate[0].getAttribute('each');
         var contextName = 'item';
         var collectionExpr = 'item.children';
         var selectExpr = itemTemplate.attr('select');
-        var selectedName = itemTemplate.attr('selected');
+        var selectedExpr = itemTemplate[0].getAttribute('selected')||'$selected';
 
         if (eachIter) {
             var match = /^\s*(\w+)\s+in\s+(.*?)\s*$/.exec(eachIter);
@@ -111,6 +111,7 @@
 
         var tree = {
             multiple: 'multiple' in attributes,
+            direct: 'direct' in attributes,
             rootElem: treeElem,
             treeModelExpr: treeModelExpr,
             itemTemplate: $compile(itemTemplate),
@@ -130,13 +131,24 @@
 
             trackSelection: !!selectExpr,
 
-            selected: function (scope, value) {
+            selected: function (scope, value, evt) {
                 if (this.trackSelection) {
-                    scope.$selected = value;
+                    this.selectedProperty(scope,value);
 
                     if (selectExpr) {
-                        scope.$eval(selectExpr);
+                        var f = $parse(selectExpr);
+                        f(scope, {
+                            '$event': evt
+                        });
                     }
+                }
+            },
+
+            selectedProperty: function(scope,value) {
+                if (arguments.length > 1) {
+                    $parse(selectedExpr).assign(scope,value);
+                } else {
+                    return $parse(selectedExpr)(scope);
                 }
             }
         };
@@ -146,10 +158,10 @@
                 var selectedItemElem = findParentListItem(evt.target);
                 var selectedItemScope = selectedItemElem ? selectedItemElem.scope() : null;
 
-                if (evt[multiSelectKey] && tree.multiple) {
+                if ((evt[multiSelectKey] || tree.direct) && tree.multiple) {
                     if (selectedItemScope) {
                         selectedItemScope.$apply(function () {
-                            tree.selected(selectedItemScope, ! selectedItemScope.$selected);
+                            tree.selected(selectedItemScope, ! tree.selectedProperty(selectedItemScope), evt);
                         });
                     }
                 } else {
@@ -157,17 +169,17 @@
                         if (! selectedItemElem || itemElem[0] !== selectedItemElem[0]) {
                             var itemScope = itemElem.scope();
 
-                            if (itemScope.$selected) {
+                            if (tree.selectedProperty(itemScope)) {
                                 itemScope.$apply(function () {
-                                    tree.selected(itemScope, false);
+                                    tree.selected(itemScope, false, evt);
                                 });
                             }
                         }
                     });
 
-                    if (selectedItemScope && ! selectedItemScope.$selected) {
+                    if (selectedItemScope && ! tree.selectedProperty(selectedItemScope)) {
                         selectedItemScope.$apply(function () {
-                            tree.selected(selectedItemScope, true);
+                            tree.selected(selectedItemScope, true, evt);
                         });
                     }
                 }
@@ -184,7 +196,7 @@
         var itemElem = tree.itemTemplate(itemScope, angular.noop);
 
         if (tree.trackSelection) {
-            itemScope.$selected = false;
+            tree.selectedProperty(itemScope,false);
         }
 
         insertListItem(listElem, itemElem, index);
@@ -238,20 +250,20 @@
             while (listElem.children().length > newList.length) {
                 var removeElem = listElem.children().eq(newList.length);
 
-                if (removeElem.scope().$selected) {
+                if (tree.selectedProperty(removeElem.scope())) {
                     tree.selected(removeElem.scope(), false);
                 }
-                
+
                 removeElem.remove();
             }
         }, true);
     }
 
     angular.module('angularTree', []).
-        directive('ngTree', ['$compile', '$document', function ($compile, $document) {
+        directive('ngTree', ['$compile', '$document', '$parse', function ($compile, $document, $parse) {
             return {
                 compile: function (elem, attrs) {
-                    var tree = initTree(elem, attrs, $compile, $document);
+                    var tree = initTree(elem, attrs, $compile, $document, $parse);
 
                     return function (scope, elem, attrs) {
                         loadTree(scope, tree, elem, tree.treeModelWatch);
